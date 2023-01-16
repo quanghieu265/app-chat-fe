@@ -93,7 +93,7 @@ const MessageList: React.FC = () => {
 
   useEffect(() => {
     if (chatId) {
-      socket = io("http://localhost:5000");
+      socket = io("https://quanghieu265-app-chat.onrender.com");
       socket.on("connect", () => {
         socket.emit("setup-chat", chatId);
       });

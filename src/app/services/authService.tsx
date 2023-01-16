@@ -11,7 +11,7 @@ const requestHeader = {
 };
 
 const axiosConfig = {
-  baseURL: "http://localhost:5000/api",
+  baseURL: process.env.REACT_APP_BACKEND_URL,
   header: requestHeader,
 };
 
