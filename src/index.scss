@@ -1,0 +1,83 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 8px;
+}
+
+.ant-layout-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.ant-card-meta-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ant-card-body {
+  padding: 0px !important;
+  flex: 1;
+  overflow: hidden;
+}
+
+.layout-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.row-height {
+  height: 100%;
+  display: flex;
+}
+
+.chat-lists {
+  background-color: #f5f7fb !important;
+  border-radius: 8px !important;
+  padding: 8px !important;
+  display: flex;
+  flex-direction: column;
+  row-gap: 8px !important;
+  height: 100%;
+  overflow: hidden;
+}
+
+.message-list {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: auto;
+  padding: 8px;
+  > div {
+    width: fit-content;
+    padding: 8px;
+    margin: 4px 0px;
+    border: 1px solid thin;
+    border-radius: 8px;
+    background-color: antiquewhite;
+  }
+  .reader {
+    background-color: rgb(211, 208, 208);
+  }
+
+  .sender {
+    margin-left: auto;
+  }
+}
