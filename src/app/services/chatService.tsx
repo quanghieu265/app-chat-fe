@@ -1,7 +1,5 @@
 import axios from "axios";
 
-let user = localStorage.getItem("user");
-
 const requestHeader = {
   Accept: "application/json",
   "Access-Control-Allow-Origin": "*",
@@ -11,33 +9,63 @@ const requestHeader = {
 };
 
 const axiosConfig = {
-  baseURL: process.env.REACT_APP_BACKEND_URL + "/api",
+  baseURL:
+    process.env.NODE_ENV === "development"
+      ? "http://localhost:5000/api"
+      : process.env.REACT_APP_BACKEND_URL + "/api",
   header: requestHeader,
 };
 
 const authInstance = axios.create(axiosConfig);
 
-if (user) {
+const makeHeader = (customConfig?: any, additionToken: string = "") => {
+  let user = localStorage.getItem("user");
+
+  if (!user) {
+    return {
+      headers: {},
+    };
+  }
+
   let { token } = JSON.parse(user);
-  authInstance.defaults.headers.common["Authorization"] = "Bearer " + token;
-}
+
+  let config: any = {
+    headers: {
+      Authorization: "Bearer " + token,
+    },
+  };
+  if (additionToken) {
+    config.headers["x-access-token"] = additionToken;
+  }
+
+  if (customConfig !== undefined && customConfig && !customConfig.headers)
+    config = {
+      ...config,
+      ...customConfig,
+    };
+
+  return config;
+};
 
 const services = {
   async addUserToChat(data: { id: number }): Promise<any> {
+    let config = makeHeader();
     let api = `/chat/addusers`;
-    let response = await authInstance.post(api, data);
+    let response = await authInstance.post(api, data, config);
     return response;
   },
 
   async getCurrentChat(): Promise<any> {
+    let config = makeHeader();
     let api = `/chat`;
-    let response = await authInstance.get(api);
+    let response = await authInstance.get(api, config);
     return response;
   },
 
   async getCurrentMessage(data: { id: number; size: number }): Promise<any> {
+    let config = makeHeader();
     let api = `/chat/message/${data.id}?size=${data.size}`;
-    let response = await authInstance.get(api);
+    let response = await authInstance.get(api, config);
     return response;
   },
 
@@ -46,14 +74,16 @@ const services = {
     message?: string;
     usersId?: number[];
   }): Promise<any> {
+    let config = makeHeader();
     let api = `/chat/message/`;
-    let response = await authInstance.post(api, data);
+    let response = await authInstance.post(api, data, config);
     return response;
   },
 
   async deleteChatById(data: { id?: number }): Promise<any> {
+    let config = makeHeader();
     let api = `/chat/${data.id}`;
-    let response = await authInstance.delete(api);
+    let response = await authInstance.delete(api, config);
     return response;
   },
 };

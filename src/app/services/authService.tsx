@@ -11,7 +11,10 @@ const requestHeader = {
 };
 
 const axiosConfig = {
-  baseURL: process.env.REACT_APP_BACKEND_URL + "/api",
+  baseURL:
+    process.env.NODE_ENV === "development"
+      ? "http://localhost:5000/api"
+      : process.env.REACT_APP_BACKEND_URL + "/api",
   header: requestHeader,
 };
 
