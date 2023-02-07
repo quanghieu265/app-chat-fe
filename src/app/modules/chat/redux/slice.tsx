@@ -1,7 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { MomentInput } from "moment";
 import { setCurrentChat } from "./action";
 
 export interface ChatItem {
+  isNotice?: boolean;
   chat_id?: number;
   users_id?: number[];
   content?: string;
@@ -10,6 +12,7 @@ export interface ChatItem {
 }
 
 export interface MessageItem {
+  created_on: MomentInput;
   chat_room_id?: number;
   content?: string;
   id?: number;

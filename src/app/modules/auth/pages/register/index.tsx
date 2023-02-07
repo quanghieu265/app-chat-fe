@@ -25,7 +25,7 @@ const RegisterPage: React.FC = () => {
       dispatch(registerSagaSuccess(false));
       navigate("/auth/login");
     }
-  }, [isRegister]);
+  }, [dispatch, isRegister, navigate]);
 
   return (
     <div className="login-page">

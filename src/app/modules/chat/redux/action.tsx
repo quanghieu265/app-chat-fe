@@ -6,9 +6,9 @@ export const setCurrentChat = createAction("SET_CURRENT_CHAT", (payload) => {
   return { payload };
 });
 
-// export const getCurrentMessage = createAction(
-//   "GET_CURRENT_MESSAGES",
-//   (payload) => {
-//     return { payload };
-//   }
-// );
+export const updateCurrentChat = createAction(
+  "UPDATE_CURRENT_CHAT",
+  (payload) => {
+    return { payload };
+  }
+);

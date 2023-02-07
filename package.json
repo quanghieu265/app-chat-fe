@@ -19,6 +19,8 @@
     "bootstrap": "^5.2.3",
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
+    "momentjs": "^2.0.0",
+    "mux.js": "^6.2.0",
     "object-path": "^0.11.8",
     "perfect-scrollbar": "^1.5.5",
     "react": "^18.2.0",

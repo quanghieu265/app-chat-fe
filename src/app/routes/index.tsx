@@ -2,6 +2,7 @@ import { useRoutes } from "react-router-dom";
 import AuthComponent from "../modules/auth/index";
 import ChatPage from "../modules/chat";
 import MessageList from "../modules/chat/components/message-list";
+import StreamPage from "../modules/stream";
 
 export function PrivateRoutes() {
   let element = useRoutes([
@@ -15,7 +16,7 @@ export function PrivateRoutes() {
     },
     {
       path: "stream",
-      element: <div>Stream Page</div>,
+      element: <StreamPage />,
     },
     {
       path: "/chat",

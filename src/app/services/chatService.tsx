@@ -28,7 +28,6 @@ const makeHeader = (customConfig?: any, additionToken: string = "") => {
   }
 
   let { token } = JSON.parse(user);
-
   let config: any = {
     headers: {
       Authorization: "Bearer " + token,
@@ -62,6 +61,13 @@ const services = {
     return response;
   },
 
+  async updateUserNoticeChatById(data: any): Promise<any> {
+    let config = makeHeader();
+    let api = `/chat/${data.chat_room_id}`;
+    let response = await authInstance.put(api, data, config);
+    return response;
+  },
+
   async getCurrentMessage(data: { id: number; size: number }): Promise<any> {
     let config = makeHeader();
     let api = `/chat/message/${data.id}?size=${data.size}`;
@@ -75,7 +81,7 @@ const services = {
     usersId?: number[];
   }): Promise<any> {
     let config = makeHeader();
-    let api = `/chat/message/`;
+    let api = `/chat/message`;
     let response = await authInstance.post(api, data, config);
     return response;
   },

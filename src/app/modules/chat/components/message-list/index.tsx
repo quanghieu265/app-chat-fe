@@ -1,21 +1,26 @@
 import { UserOutlined } from "@ant-design/icons";
 import { DefaultEventsMap } from "@socket.io/component-emitter";
-import { Avatar, Card, Input, Skeleton } from "antd";
+import { Avatar, Card, Input, Skeleton, Tooltip } from "antd";
+import moment from "moment";
 import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import io, { Socket } from "socket.io-client";
 import { openNotification } from "src/app/layout/notification";
 import { RootState } from "src/app/redux/store";
 import services from "src/app/services";
 import { setCurrentChat } from "./../../redux/action";
 import { ChatItem, MessageItem } from "./../../redux/slice";
+
 const { Meta } = Card;
 let socket: Socket<DefaultEventsMap, DefaultEventsMap>;
 let size = 15;
 let total = 0;
+let SelectedChatUserId: number | undefined;
+
 const MessageList: React.FC = () => {
   const _ = require("lodash");
+  let navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.auth.user);
   const allChat = useSelector((state: RootState) => state.chat.currentChat);
@@ -23,7 +28,7 @@ const MessageList: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<MessageItem[]>([]);
   const [value, setValue] = useState<string>("");
-  const [chat, setChat] = useState<ChatItem>({});
+  const [selectedChat, setSelectedChat] = useState<ChatItem>({});
 
   const getMessage = useCallback(async (chatId: number) => {
     try {
@@ -46,27 +51,27 @@ const MessageList: React.FC = () => {
 
   const sendMessage = async (e: any) => {
     let message = e.target.value;
-    let usersId = chat.users_id;
+    let usersId = selectedChat.users_id;
     let data = {
       chatId,
       message,
       usersId,
     };
-    try {
-      const res = await services.Chat.addNewMessage(data);
-      let newCurrentChat = _.cloneDeep(allChat);
-      newCurrentChat.content = res.data.content;
-      dispatch(setCurrentChat(newCurrentChat));
-      setMessage((prev) => {
-        let newMess = [...prev];
-        newMess.push(res.data);
-        return newMess;
-      });
-      socket.emit("send-message-to-server", res.data);
-    } catch (error: any) {
-      const { response } = error;
-      openNotification("error", response.data.message);
+    const res = await services.Chat.addNewMessage(data);
+    let newAllChat: ChatItem[] = _.cloneDeep(allChat);
+    let index = newAllChat.findIndex((item: ChatItem) => {
+      return item.chat_id === res.data.chat_room_id;
+    });
+    if (index !== -1) {
+      newAllChat[index].content = res.data.content;
+      dispatch(setCurrentChat(newAllChat));
     }
+    setMessage((prev) => {
+      let newMess = [...prev];
+      newMess.push(res.data);
+      return newMess;
+    });
+    socket.emit("send-message-to-server", SelectedChatUserId, res.data);
     setValue("");
   };
 
@@ -87,19 +92,32 @@ const MessageList: React.FC = () => {
     }
   };
 
+  const handleNotify = async (msg: MessageItem) => {
+    await services.Chat.updateUserNoticeChatById(msg);
+    let newAllChat: ChatItem[] = _.cloneDeep(allChat);
+    let index = newAllChat.findIndex((item: ChatItem) => {
+      return item.chat_id === msg.chat_room_id;
+    });
+    if (index !== -1) {
+      newAllChat[index].content = msg.content;
+      newAllChat[index].isNotice = true;
+      dispatch(setCurrentChat(newAllChat));
+    }
+  };
+
   useEffect(() => {
     if (chatId) getMessage(parseInt(chatId));
   }, [chatId, getMessage]);
 
   useEffect(() => {
-    if (chatId) {
+    if (user.id) {
       const host =
         process.env.NODE_ENV === "development"
           ? "http://localhost:5000"
           : "https://quanghieu265-app-chat.onrender.com";
       socket = io(host);
       socket.on("connect", () => {
-        socket.emit("setup-chat", chatId);
+        socket.emit("setup-chat", user.id);
       });
 
       socket.on("disconnect", () => {});
@@ -107,18 +125,23 @@ const MessageList: React.FC = () => {
       socket.on("connected-chat", () => {});
 
       socket.on("send-message-to-client", (msg: any) => {
-        setMessage((prev) => {
-          let newMess = [...prev];
-          newMess.push(msg);
-          return newMess;
-        });
+        if (msg.chat_room_id === chatId) {
+          setMessage((prev) => {
+            let newMess = [...prev];
+            newMess.push(msg);
+            return newMess;
+          });
+        } else {
+          handleNotify(msg);
+        }
       });
 
       return () => {
         socket.off();
       };
     }
-  }, [chatId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chatId, user.id]);
 
   useEffect(() => {
     const el = document.getElementById("message-list");
@@ -131,9 +154,15 @@ const MessageList: React.FC = () => {
 
   useEffect(() => {
     if (allChat && chatId) {
-      setChat(allChat.filter((item) => item.chat_id === +chatId)[0]);
+      const chat = allChat.filter((item) => item.chat_id === +chatId)[0];
+      if (chat) {
+        setSelectedChat(chat);
+        SelectedChatUserId = chat.users_id?.filter((id) => id !== user.id)[0];
+      } else {
+        navigate("/chat/");
+      }
     }
-  }, [chatId, allChat]);
+  }, [chatId, allChat, navigate, user.id]);
 
   return (
     <Card
@@ -141,9 +170,13 @@ const MessageList: React.FC = () => {
         <Skeleton loading={loading} avatar active>
           <Meta
             avatar={
-              chat?.avatar ? <Avatar src={chat.avatar} /> : <UserOutlined />
+              selectedChat?.avatar ? (
+                <Avatar src={selectedChat.avatar} />
+              ) : (
+                <UserOutlined />
+              )
             }
-            title={chat?.chat_name}
+            title={selectedChat?.chat_name}
           />
         </Skeleton>
       }
@@ -180,7 +213,12 @@ const MessageList: React.FC = () => {
               key={index}
               className={message.sender !== user.id ? "reader" : "sender"}
             >
-              {message.content}
+              <Tooltip
+                title={moment(message.created_on).format("DD-MM-YYYY HH:mm")}
+                trigger="hover"
+              >
+                {message.content}
+              </Tooltip>
             </div>
           );
         })}
