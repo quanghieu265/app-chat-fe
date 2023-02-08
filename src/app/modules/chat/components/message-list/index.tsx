@@ -1,6 +1,17 @@
-import { UserOutlined } from "@ant-design/icons";
+import { storageFB } from "@/firebase/index";
+import { UploadOutlined, UserOutlined } from "@ant-design/icons";
 import { DefaultEventsMap } from "@socket.io/component-emitter";
-import { Avatar, Card, Input, Skeleton, Tooltip } from "antd";
+import {
+  Avatar,
+  Button,
+  Card,
+  Input,
+  Skeleton,
+  Tooltip,
+  Upload,
+  UploadFile,
+} from "antd";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import moment from "moment";
 import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -11,6 +22,8 @@ import { RootState } from "src/app/redux/store";
 import services from "src/app/services";
 import { setCurrentChat } from "./../../redux/action";
 import { ChatItem, MessageItem } from "./../../redux/slice";
+
+import type { UploadProps } from "antd";
 
 const { Meta } = Card;
 let socket: Socket<DefaultEventsMap, DefaultEventsMap>;
@@ -29,6 +42,17 @@ const MessageList: React.FC = () => {
   const [message, setMessage] = useState<MessageItem[]>([]);
   const [value, setValue] = useState<string>("");
   const [selectedChat, setSelectedChat] = useState<ChatItem>({});
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
+
+  const UploadProps: UploadProps = {
+    name: "file",
+    accept: "image/* ,video/*,.ts",
+    showUploadList: false,
+    beforeUpload: (file) => {
+      setFileList([...fileList, file]);
+      return false;
+    },
+  };
 
   const getMessage = useCallback(async (chatId: number) => {
     try {
@@ -49,30 +73,55 @@ const MessageList: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const sendMessage = async (e: any) => {
-    let message = e.target.value;
+  const uploadFile = async (file: any) => {
+    const storageRef = ref(storageFB, file.name);
+    const uploadTask = await uploadBytes(storageRef, file);
+    const url = await getDownloadURL(uploadTask.ref);
+    return url;
+  };
+
+  const sendMessage = async (text: string, fileList: any) => {
     let usersId = selectedChat.users_id;
+    let message = [];
+
+    if (text) {
+      message.push({ content: text, type: "text" });
+    }
+    if (fileList.length > 0) {
+      //need upload video/img to firebase
+      let files = await Promise.all(
+        fileList.map(async (file: any) => {
+          const content = await uploadFile(file);
+          return { content, type: file.type };
+        })
+      );
+      message = [...message, ...files];
+    }
+    //
     let data = {
       chatId,
       message,
       usersId,
     };
+    // create mess in DB
     const res = await services.Chat.addNewMessage(data);
+    // update all chat FE
     let newAllChat: ChatItem[] = _.cloneDeep(allChat);
     let index = newAllChat.findIndex((item: ChatItem) => {
-      return item.chat_id === res.data.chat_room_id;
+      return item.chat_id === res.data[0].chat_room_id;
     });
     if (index !== -1) {
-      newAllChat[index].content = res.data.content;
+      newAllChat[index].content = res.data[res.data.length - 1].content;
       dispatch(setCurrentChat(newAllChat));
     }
     setMessage((prev) => {
-      let newMess = [...prev];
-      newMess.push(res.data);
+      let newMess = [...prev, ...res.data];
       return newMess;
     });
-    socket.emit("send-message-to-server", SelectedChatUserId, res.data);
     setValue("");
+    setFileList([]);
+    // send message realtime
+    socket.emit("send-message-to-server", SelectedChatUserId, res.data);
   };
 
   const onScrollMessage = async (e: React.UIEvent<HTMLElement, UIEvent>) => {
@@ -105,6 +154,41 @@ const MessageList: React.FC = () => {
     }
   };
 
+  const onRemoveFile = (index: number) => {
+    const newFileList = fileList.slice();
+    newFileList.splice(index, 1);
+    setFileList(newFileList);
+  };
+
+  const renderMessage = (message: ChatItem) => {
+    if (message.tag && message.tag.includes("text")) {
+      return message.content;
+    }
+    if (message.tag && ["video/mpeg", "video/mp4"].includes(message.tag)) {
+      return (
+        <video style={{ height: 400 }} controls muted>
+          <source src={message.content} />
+        </video>
+      );
+    }
+    if (message.tag && message.tag.includes("image")) {
+      return (
+        <a href={message.content} target="_blank" rel="noreferrer">
+          <img
+            style={{ width: 200, height: 200 }}
+            src={message.content}
+            alt=""
+          />
+        </a>
+      );
+    }
+    return (
+      <a href={message.content} target="_blank" rel="noreferrer">
+        Download file
+      </a>
+    );
+  };
+
   useEffect(() => {
     if (chatId) getMessage(parseInt(chatId));
   }, [chatId, getMessage]);
@@ -127,8 +211,7 @@ const MessageList: React.FC = () => {
       socket.on("send-message-to-client", (msg: any) => {
         if (msg.chat_room_id === chatId) {
           setMessage((prev) => {
-            let newMess = [...prev];
-            newMess.push(msg);
+            let newMess = [...prev, ...msg];
             return newMess;
           });
         } else {
@@ -184,19 +267,57 @@ const MessageList: React.FC = () => {
       actions={
         !loading
           ? [
-              <div style={{ display: "flex", padding: "0px 8px" }}>
-                <Input
-                  value={value}
-                  style={{ backgroundColor: "#F5F7FB", padding: 8 }}
-                  bordered={false}
-                  placeholder="Enter message"
-                  onPressEnter={(e: any) => {
-                    if (e.target.value) sendMessage(e);
+              <div style={{ margin: "0px 8px" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    padding: "4px 8px",
+                    backgroundColor: "#F5F7FB",
+                    borderRadius: 8,
                   }}
-                  onChange={(e: any) => {
-                    setValue(e.target.value);
-                  }}
-                />
+                >
+                  <Input
+                    value={value}
+                    style={{ padding: 0 }}
+                    bordered={false}
+                    placeholder="Enter message"
+                    onPressEnter={(e: any) => {
+                      if (e.target.value || fileList.length > 0)
+                        sendMessage(e.target.value, fileList);
+                    }}
+                    onChange={(e: any) => {
+                      setValue(e.target.value);
+                    }}
+                  />
+                  <Upload {...UploadProps} fileList={fileList}>
+                    <Button icon={<UploadOutlined />}></Button>
+                  </Upload>
+                </div>
+                {fileList.length > 0 && (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      flexWrap: "wrap",
+                      marginTop: 8,
+                    }}
+                  >
+                    {fileList.map((item, index) => {
+                      return (
+                        <Button
+                          key={index}
+                          type="text"
+                          onClick={() => {
+                            onRemoveFile(index);
+                          }}
+                        >
+                          {item.name}
+                        </Button>
+                      );
+                    })}
+                  </div>
+                )}
               </div>,
             ]
           : []
@@ -217,7 +338,7 @@ const MessageList: React.FC = () => {
                 title={moment(message.created_on).format("DD-MM-YYYY HH:mm")}
                 trigger="hover"
               >
-                {message.content}
+                {renderMessage(message)}
               </Tooltip>
             </div>
           );

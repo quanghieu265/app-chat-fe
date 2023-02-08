@@ -9,6 +9,7 @@ export interface ChatItem {
   content?: string;
   chat_name?: string;
   avatar?: string;
+  tag?: string;
 }
 
 export interface MessageItem {

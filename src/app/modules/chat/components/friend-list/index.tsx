@@ -77,12 +77,12 @@ const FriendList: React.FC = () => {
               data={data}
               // height={height}
               itemHeight={47}
-              itemKey="email"
+              itemKey="chat_id"
               onScroll={onScroll}
             >
-              {(item: ChatItem) => (
+              {(item: ChatItem, index) => (
                 <List.Item
-                  key={item.chat_id}
+                  key={index}
                   style={{ padding: "12px 0px" }}
                   actions={[
                     <Popconfirm

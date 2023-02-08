@@ -1,4 +1,5 @@
 import axios from "axios";
+import { IMessage } from "../helper/type";
 
 const requestHeader = {
   Accept: "application/json",
@@ -77,7 +78,7 @@ const services = {
 
   async addNewMessage(data: {
     chatId?: string;
-    message?: string;
+    message?: IMessage[];
     usersId?: number[];
   }): Promise<any> {
     let config = makeHeader();
