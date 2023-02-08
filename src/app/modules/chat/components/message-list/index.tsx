@@ -120,6 +120,7 @@ const MessageList: React.FC = () => {
     });
     setValue("");
     setFileList([]);
+    total += res.data.length;
     // send message realtime
     socket.emit("send-message-to-server", SelectedChatUserId, res.data);
   };
@@ -127,6 +128,14 @@ const MessageList: React.FC = () => {
   const onScrollMessage = async (e: React.UIEvent<HTMLElement, UIEvent>) => {
     if (e.currentTarget.scrollTop === 0 && chatId) {
       if (message.length === total) return;
+      console.log(
+        "here",
+        message,
+        message.length,
+        total,
+        message.length === total
+      );
+
       size += 25;
       try {
         const res = await services.Chat.getCurrentMessage({
@@ -134,6 +143,7 @@ const MessageList: React.FC = () => {
           size,
         });
         setMessage(_.reverse(res.data.list));
+        total = +res.data.total;
       } catch (error: any) {
         const { response } = error;
         openNotification("error", response.data.message);
