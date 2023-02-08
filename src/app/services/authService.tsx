@@ -1,4 +1,5 @@
 import axios from "axios";
+import { makeHeader } from "./chatService";
 
 let user = localStorage.getItem("user");
 
@@ -39,8 +40,9 @@ const services = {
   },
 
   async getUser(): Promise<any> {
+    let config = makeHeader();
     let api = `/user`;
-    let response = await authInstance.get(api);
+    let response = await authInstance.get(api, config);
     return response;
   },
 };

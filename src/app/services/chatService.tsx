@@ -19,7 +19,7 @@ const axiosConfig = {
 
 const authInstance = axios.create(axiosConfig);
 
-const makeHeader = (customConfig?: any, additionToken: string = "") => {
+export const makeHeader = (customConfig?: any, additionToken: string = "") => {
   let user = localStorage.getItem("user");
 
   if (!user) {
