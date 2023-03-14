@@ -3,20 +3,25 @@ import AuthComponent from "../modules/auth/index";
 import ChatPage from "../modules/chat";
 import MessageList from "../modules/chat/components/message-list";
 import StreamPage from "../modules/stream";
+import VideoCallPage from "../modules/call";
 
 export function PrivateRoutes() {
   let element = useRoutes([
     {
       path: "about",
-      element: <div>About Page</div>,
+      element: <div>About Page</div>
     },
     {
       path: "home",
-      element: <div>Home Page</div>,
+      element: <div>Home Page</div>
     },
     {
       path: "stream",
-      element: <StreamPage />,
+      element: <StreamPage />
+    },
+    {
+      path: "call",
+      element: <VideoCallPage />
     },
     {
       path: "/chat",
@@ -24,10 +29,10 @@ export function PrivateRoutes() {
       children: [
         {
           path: ":chatId",
-          element: <MessageList />,
-        },
-      ],
-    },
+          element: <MessageList />
+        }
+      ]
+    }
   ]);
 
   return element;
@@ -37,8 +42,8 @@ export function PublicRoutes() {
   let element = useRoutes([
     {
       path: "auth/*",
-      element: <AuthComponent />,
-    },
+      element: <AuthComponent />
+    }
   ]);
 
   return element;

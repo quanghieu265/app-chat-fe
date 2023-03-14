@@ -1,0 +1,16 @@
+.video-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-basis: content;
+
+}
+.video-info {
+  display: flex;
+  gap: 8px;
+  > div {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+}

@@ -2,6 +2,7 @@ import {
   DesktopOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
+  PhoneOutlined,
   PieChartOutlined,
   UserOutlined,
 } from "@ant-design/icons";
@@ -41,7 +42,8 @@ function getItem(
 const menuItems: MenuItem[] = [
   getItem(<Link to="stream">Streaming</Link>, "stream", <DesktopOutlined />),
   getItem(<Link to="chat">Chat</Link>, "chat", <PieChartOutlined />),
-  getItem("Friends", "sub1", <UserOutlined />, [
+  getItem(<Link to="call">Video Call</Link>, "call", <PhoneOutlined />),
+    getItem("Friends", "sub1", <UserOutlined />, [
     getItem("Tom", "3"),
     getItem("Bill", "4"),
     getItem("Alex", "5"),
@@ -142,6 +144,7 @@ const AppLayout = ({ children }: Props) => {
               minHeight: 280,
               background: colorBgContainer,
               flex: "auto",
+              overflowY: "auto",
             }}
           >
             {children}
