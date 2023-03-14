@@ -3,11 +3,11 @@
   flex-direction: column;
   gap: 8px;
   flex-basis: content;
-
 }
 .video-info {
   display: flex;
   gap: 8px;
+  align-items: flex-end;
   > div {
     display: flex;
     flex-direction: column;
