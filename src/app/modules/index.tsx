@@ -11,7 +11,7 @@ const ModulesComponent = () => {
   );
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated) {      
       const user: any = localStorage.getItem("user");
       const userData = user ? JSON.parse(user) : null;
       dispatch(setAuthenticated(userData));

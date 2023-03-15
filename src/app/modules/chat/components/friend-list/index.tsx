@@ -23,7 +23,8 @@ const FriendList: React.FC = () => {
     if (el) {
       // setHeight(el.clientHeight);
     }
-  }, [dispatch]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     setData(currentChat);
@@ -38,7 +39,7 @@ const FriendList: React.FC = () => {
   const handleDeleteChat = async (id?: number) => {
     const res = await services.Chat.deleteChatById({ id: id });
     if (res.status === 200) {
-      dispatch(setCurrentChat(data.filter((item) => item.chat_id !== id)));
+      dispatch(setCurrentChat(data.filter(item => item.chat_id !== id)));
       openNotification("success", "Delete successfully");
     }
   };
@@ -50,7 +51,7 @@ const FriendList: React.FC = () => {
           style={{
             display: "flex",
             justifyContent: "space-between",
-            padding: "12px 0px",
+            padding: "12px 0px"
           }}
         >
           <h1>Chats</h1>
@@ -68,7 +69,7 @@ const FriendList: React.FC = () => {
         <SearchFriends />
         <div
           style={{
-            padding: "12px 0px",
+            padding: "12px 0px"
           }}
         >
           <h1>Recent</h1>
@@ -96,7 +97,7 @@ const FriendList: React.FC = () => {
                       cancelText="Cancel"
                     >
                       <Button type="text" icon={<DeleteOutlined />}></Button>
-                    </Popconfirm>,
+                    </Popconfirm>
                   ]}
                 >
                   <List.Item.Meta

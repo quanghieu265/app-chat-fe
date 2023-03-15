@@ -4,7 +4,7 @@ import {
   MenuUnfoldOutlined,
   PhoneOutlined,
   PieChartOutlined,
-  UserOutlined,
+  UserOutlined
 } from "@ant-design/icons";
 import {
   Avatar,
@@ -13,13 +13,14 @@ import {
   Layout,
   Menu,
   MenuProps,
-  theme,
+  theme
 } from "antd";
 import React, { ReactNode, useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
 import { removeAuthenticated } from "../modules/auth/redux/action";
 import { RootState } from "../redux/store";
+import services from "../services";
 
 const { Header, Content, Sider } = Layout;
 
@@ -35,7 +36,7 @@ function getItem(
     key,
     icon,
     children,
-    label,
+    label
   } as MenuItem;
 }
 
@@ -43,11 +44,11 @@ const menuItems: MenuItem[] = [
   getItem(<Link to="stream">Streaming</Link>, "stream", <DesktopOutlined />),
   getItem(<Link to="chat">Chat</Link>, "chat", <PieChartOutlined />),
   getItem(<Link to="call">Video Call</Link>, "call", <PhoneOutlined />),
-    getItem("Friends", "sub1", <UserOutlined />, [
+  getItem("Friends", "sub1", <UserOutlined />, [
     getItem("Tom", "3"),
     getItem("Bill", "4"),
-    getItem("Alex", "5"),
-  ]),
+    getItem("Alex", "5")
+  ])
 ];
 
 interface Props {
@@ -61,19 +62,20 @@ const AppLayout = ({ children }: Props) => {
 
   const [collapsed, setCollapsed] = useState(false);
   const {
-    token: { colorBgContainer },
+    token: { colorBgContainer }
   } = theme.useToken();
 
-  const handleLogOut = () => {
-    localStorage.removeItem("user");
+  const handleLogOut = async () => {
+    await services.Auth.logoutUser();
+    localStorage.clear();
     dispatch(removeAuthenticated());
   };
 
   const items: MenuProps["items"] = [
     {
       key: "1",
-      label: <div onClick={handleLogOut}>Log out</div>,
-    },
+      label: <div onClick={handleLogOut}>Log out</div>
+    }
   ];
 
   const getSelectMenu = useCallback(() => {
@@ -96,7 +98,7 @@ const AppLayout = ({ children }: Props) => {
           style={{
             height: 32,
             margin: 16,
-            background: "rgba(255, 255, 255, 0.2)",
+            background: "rgba(255, 255, 255, 0.2)"
           }}
         />
         <Menu
@@ -115,7 +117,7 @@ const AppLayout = ({ children }: Props) => {
             collapsed ? MenuUnfoldOutlined : MenuFoldOutlined,
             {
               className: "trigger",
-              onClick: () => setCollapsed(!collapsed),
+              onClick: () => setCollapsed(!collapsed)
             }
           )}
           <div style={{ display: "flex", alignItems: "center" }}>
@@ -144,7 +146,7 @@ const AppLayout = ({ children }: Props) => {
               minHeight: 280,
               background: colorBgContainer,
               flex: "auto",
-              overflowY: "auto",
+              overflowY: "auto"
             }}
           >
             {children}
