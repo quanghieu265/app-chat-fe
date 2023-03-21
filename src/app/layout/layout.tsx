@@ -15,10 +15,13 @@ import {
   MenuProps,
   theme
 } from "antd";
-import React, { ReactNode, useCallback, useState } from "react";
+import React, { ReactNode, useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
-import { removeAuthenticated } from "../modules/auth/redux/action";
+import {
+  removeAuthenticated,
+  setFriendList
+} from "../modules/auth/redux/action";
 import { RootState } from "../redux/store";
 import services from "../services";
 
@@ -40,17 +43,6 @@ function getItem(
   } as MenuItem;
 }
 
-const menuItems: MenuItem[] = [
-  getItem(<Link to="stream">Streaming</Link>, "stream", <DesktopOutlined />),
-  getItem(<Link to="chat">Chat</Link>, "chat", <PieChartOutlined />),
-  getItem(<Link to="call">Video Call</Link>, "call", <PhoneOutlined />),
-  getItem("Friends", "sub1", <UserOutlined />, [
-    getItem("Tom", "3"),
-    getItem("Bill", "4"),
-    getItem("Alex", "5")
-  ])
-];
-
 interface Props {
   children?: ReactNode;
 }
@@ -61,6 +53,7 @@ const AppLayout = ({ children }: Props) => {
   const location = useLocation();
 
   const [collapsed, setCollapsed] = useState(false);
+
   const {
     token: { colorBgContainer }
   } = theme.useToken();
@@ -78,6 +71,20 @@ const AppLayout = ({ children }: Props) => {
     }
   ];
 
+  const menuItems: MenuItem[] = [
+    getItem(
+      "Blogs",
+      "blogs",
+      <UserOutlined />,
+      (user.friends_id || []).map(i => {
+        return getItem(<Link to={`blogs/${i.id}`}>{i.username}</Link>, `sub-blog-${i.id}`);
+      })
+    ),
+    getItem(<Link to="chat">Chat</Link>, "chat", <PieChartOutlined />),
+    getItem(<Link to="call">Video Call</Link>, "call", <PhoneOutlined />),
+    getItem(<Link to="stream">Streaming</Link>, "stream", <DesktopOutlined />)
+  ];
+
   const getSelectMenu = useCallback(() => {
     let path = location.pathname;
     let menuSelected = menuItems.map((item: any) => {
@@ -89,7 +96,20 @@ const AppLayout = ({ children }: Props) => {
     });
 
     return menuSelected;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location]);
+
+  const getFriendsList = useCallback(async () => {
+    const res = await services.Chat.getFriendList();
+    if (res.data) {
+      dispatch(setFriendList(res.data));
+    }
+  }, []);
+
+  useEffect(() => {
+    getFriendsList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <Layout style={{ height: "100vh", overflow: "hidden" }}>

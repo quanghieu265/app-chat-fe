@@ -19,9 +19,9 @@ const services = {
     return response;
   },
 
-  async getUser(): Promise<any> {
-    let api = `/user`;
-    let response = await axiosInstance.get(api);
+  async searchUsers(params: { username: string }): Promise<any> {
+    let api = `/user/search`;
+    let response = await axiosInstance.get(api, { params });
     return response;
   },
 

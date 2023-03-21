@@ -19,3 +19,7 @@ export const registerSagaSuccess = createAction(
 export const loginSaga = createAction("LOGIN_SAGA", (payload) => {
   return { payload };
 });
+
+export const setFriendList = createAction("SET_FRIENDS_LIST", (payload) => {
+  return { payload };
+});

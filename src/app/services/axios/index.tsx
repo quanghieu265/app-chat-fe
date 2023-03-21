@@ -45,7 +45,7 @@ axiosInstance.interceptors.response.use(
       localStorage.clear();
       window.location.reload();
     }
-    return Promise.reject(error);
+    return Promise.reject(error.response.data);
   }
 );
 

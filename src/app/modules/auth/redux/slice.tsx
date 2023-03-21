@@ -3,6 +3,7 @@ import {
   setAuthenticated,
   removeAuthenticated,
   registerSagaSuccess,
+  setFriendList
 } from "./action";
 
 const checkAuthenticated = () => {
@@ -22,6 +23,7 @@ export interface IUser {
   username?: string;
   email?: string;
   token?: string;
+  friends_id?: IUser[];
 }
 
 export interface AuthState {
@@ -33,30 +35,33 @@ export interface AuthState {
 const initialState: AuthState = {
   isRegister: false,
   isAuthenticated: checkAuthenticated(),
-  user: checkUser(),
+  user: checkUser()
 };
 
 export const authSlice = createSlice({
   name: "counter",
   initialState,
   reducers: {},
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     builder.addCase(setAuthenticated, (state, action) => {
       state.isAuthenticated = true;
       state.user = action.payload;
     });
-    builder.addCase(removeAuthenticated, (state) => {
+    builder.addCase(removeAuthenticated, state => {
       state.isAuthenticated = false;
       state.user = {};
     });
     builder.addCase(registerSagaSuccess, (state, action) => {
       state.isRegister = action.payload;
     });
+    builder.addCase(setFriendList, (state, action) => {
+      state.user = { ...state.user, friends_id: action.payload };
+    });
 
-    builder.addDefaultCase((state) => {
+    builder.addDefaultCase(state => {
       return state;
     });
-  },
+  }
 });
 
 // Action creators are generated for each case reducer function

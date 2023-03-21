@@ -1,11 +1,16 @@
 import { IMessage } from "../helper/type";
+import { openNotification } from "../layout/notification";
 import axiosInstance from "./axios";
 
 const services = {
   async addUserToChat(data: { id: number }): Promise<any> {
-    let api = `/chat/addusers`;
-    let response = await axiosInstance.post(api, data);
-    return response;
+    try {
+      let api = `/chat/addusers`;
+      let response = await axiosInstance.post(api, data);
+      return response;
+    } catch (error: any) {
+      return openNotification("error", error.message);
+    }
   },
 
   async getCurrentChat(): Promise<any> {
@@ -39,6 +44,22 @@ const services = {
   async deleteChatById(data: { id?: number }): Promise<any> {
     let api = `/chat/${data.id}`;
     let response = await axiosInstance.delete(api);
+    return response;
+  },
+
+  async addUserToFriendsList(data: { userId?: number }): Promise<any> {
+    try {
+      let api = `/user/add`;
+      let response = await axiosInstance.post(api, data);
+      return response;
+    } catch (error: any) {
+      return openNotification("error", error.message);
+    }
+  },
+
+  async getFriendList() {
+    let api = `/chat/friends`;
+    let response = await axiosInstance.get(api);
     return response;
   }
 };

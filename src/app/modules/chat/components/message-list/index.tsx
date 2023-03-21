@@ -9,7 +9,7 @@ import {
   Skeleton,
   Tooltip,
   Upload,
-  UploadFile,
+  UploadFile
 } from "antd";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import moment from "moment";
@@ -48,17 +48,17 @@ const MessageList: React.FC = () => {
     name: "file",
     accept: "image/* ,video/*,.ts",
     showUploadList: false,
-    beforeUpload: (file) => {
+    beforeUpload: file => {
       setFileList([...fileList, file]);
       return false;
-    },
+    }
   };
 
   const getMessage = useCallback(async (chatId: number) => {
     try {
       const res = await services.Chat.getCurrentMessage({
         id: chatId,
-        size,
+        size
       });
       setMessage(_.reverse(res.data.list));
       total = +res.data.total;
@@ -101,7 +101,7 @@ const MessageList: React.FC = () => {
     let data = {
       chatId,
       message,
-      usersId,
+      usersId
     };
     // create mess in DB
     const res = await services.Chat.addNewMessage(data);
@@ -114,7 +114,7 @@ const MessageList: React.FC = () => {
       newAllChat[index].content = res.data[res.data.length - 1].content;
       dispatch(setCurrentChat(newAllChat));
     }
-    setMessage((prev) => {
+    setMessage(prev => {
       let newMess = [...prev, ...res.data];
       return newMess;
     });
@@ -128,19 +128,11 @@ const MessageList: React.FC = () => {
   const onScrollMessage = async (e: React.UIEvent<HTMLElement, UIEvent>) => {
     if (e.currentTarget.scrollTop === 0 && chatId) {
       if (message.length === total) return;
-      console.log(
-        "here",
-        message,
-        message.length,
-        total,
-        message.length === total
-      );
-
       size += 25;
       try {
         const res = await services.Chat.getCurrentMessage({
           id: +chatId,
-          size,
+          size
         });
         setMessage(_.reverse(res.data.list));
         total = +res.data.total;
@@ -220,7 +212,7 @@ const MessageList: React.FC = () => {
 
       socket.on("send-message-to-client", (msg: any) => {
         if (msg.chat_room_id === chatId) {
-          setMessage((prev) => {
+          setMessage(prev => {
             let newMess = [...prev, ...msg];
             return newMess;
           });
@@ -247,10 +239,10 @@ const MessageList: React.FC = () => {
 
   useEffect(() => {
     if (allChat && chatId) {
-      const chat = allChat.filter((item) => item.chat_id === +chatId)[0];
+      const chat = allChat.filter(item => item.chat_id === +chatId)[0];
       if (chat) {
         setSelectedChat(chat);
-        SelectedChatUserId = chat.users_id?.filter((id) => id !== user.id)[0];
+        SelectedChatUserId = chat.users_id?.filter(id => id !== user.id)[0];
       } else {
         navigate("/chat/");
       }
@@ -261,16 +253,37 @@ const MessageList: React.FC = () => {
     <Card
       title={
         <Skeleton loading={loading} avatar active>
-          <Meta
-            avatar={
-              selectedChat?.avatar ? (
-                <Avatar src={selectedChat.avatar} />
-              ) : (
-                <UserOutlined />
-              )
-            }
-            title={selectedChat?.chat_name}
-          />
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center"
+            }}
+          >
+            <Meta
+              avatar={
+                selectedChat?.avatar ? (
+                  <Avatar src={selectedChat.avatar} />
+                ) : (
+                  <UserOutlined />
+                )
+              }
+              title={selectedChat?.chat_name}
+              description="Offline"
+            />
+
+            {!_.some(user.friends_id, ["id", SelectedChatUserId]) && SelectedChatUserId && (
+              <Button
+                onClick={async () => {
+                  await services.Chat.addUserToFriendsList({
+                    userId: SelectedChatUserId
+                  });
+                }}
+              >
+                Add Friend
+              </Button>
+            )}
+          </div>
         </Skeleton>
       }
       style={{ height: "100%", display: "flex", flexDirection: "column" }}
@@ -284,7 +297,7 @@ const MessageList: React.FC = () => {
                     alignItems: "center",
                     padding: "4px 8px",
                     backgroundColor: "#F5F7FB",
-                    borderRadius: 8,
+                    borderRadius: 8
                   }}
                 >
                   <Input
@@ -310,7 +323,7 @@ const MessageList: React.FC = () => {
                       display: "flex",
                       alignItems: "center",
                       flexWrap: "wrap",
-                      marginTop: 8,
+                      marginTop: 8
                     }}
                   >
                     {fileList.map((item, index) => {
@@ -328,7 +341,7 @@ const MessageList: React.FC = () => {
                     })}
                   </div>
                 )}
-              </div>,
+              </div>
             ]
           : []
       }
