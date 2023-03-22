@@ -76,9 +76,22 @@ const AppLayout = ({ children }: Props) => {
       "Blogs",
       "blogs",
       <UserOutlined />,
-      (user.friends_id || []).map(i => {
-        return getItem(<Link to={`blogs/${i.id}`}>{i.username}</Link>, `sub-blog-${i.id}`);
-      })
+      (user
+        ? [
+            getItem(
+              <Link to={`blogs/${user.id}`}>{user.username}</Link>,
+              `sub-blog-${user.id}`
+            )
+          ]
+        : []
+      ).concat(
+        (user.friends_id || []).map(i => {
+          return getItem(
+            <Link to={`blogs/${i.id}`}>{i.username}</Link>,
+            `sub-blog-${i.id}`
+          );
+        })
+      )
     ),
     getItem(<Link to="chat">Chat</Link>, "chat", <PieChartOutlined />),
     getItem(<Link to="call">Video Call</Link>, "call", <PhoneOutlined />),

@@ -192,8 +192,11 @@ const MessageList: React.FC = () => {
   };
 
   useEffect(() => {
+    console.log(chatId);
+    
     if (chatId) getMessage(parseInt(chatId));
-  }, [chatId, getMessage]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chatId]);
 
   useEffect(() => {
     if (user.id) {

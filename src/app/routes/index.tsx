@@ -6,10 +6,10 @@ import {
 } from "@ant-design/icons";
 import { useRoutes } from "react-router-dom";
 import AuthComponent from "../modules/auth/index";
-import VideoCallPage from "../modules/call";
-import ChatPage from "../modules/chat";
-import MessageList from "../modules/chat/components/message-list";
-import StreamPage from "../modules/stream";
+import VideoCallRoutes from "../modules/call";
+import ChatRoutes from "../modules/chat";
+import StreamRoutes from "../modules/stream";
+import BlogRoutes from "../modules/blogs";
 
 interface IRoutes {
   name?: string;
@@ -23,45 +23,32 @@ interface IRoutes {
 export const privateRoutes: IRoutes[] = [
   {
     name: "Streaming",
-    path: "stream",
-    element: <StreamPage />,
+    path: "stream/*",
+    element: <StreamRoutes />,
     icon: <DesktopOutlined />
   },
   {
     name: "Video Call",
-    path: "call",
-    element: <VideoCallPage />,
+    path: "call/*",
+    element: <VideoCallRoutes />,
     icon: <PhoneOutlined />
   },
   {
     name: "Chat",
-    path: "chat",
-    element: <ChatPage />,
-    icon: <PieChartOutlined />,
-    children: [
-      {
-        path: ":chatId",
-        element: <MessageList />
-      }
-    ]
+    path: "chat/*",
+    element: <ChatRoutes />,
+    icon: <PieChartOutlined />
   },
   {
     name: "Blogs",
-    path: "/blogs",
-    element: <ChatPage />,
-    icon: <UserOutlined />,
-    children: [
-      {
-        path: ":userId",
-        element: <MessageList />
-      }
-    ]
+    path: "blogs/*",
+    element: <BlogRoutes />,
+    icon: <UserOutlined />
   }
 ];
 
 export function PrivateRoutes() {
   let element = useRoutes(privateRoutes);
-
   return element;
 }
 
