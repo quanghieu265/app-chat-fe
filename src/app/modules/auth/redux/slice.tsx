@@ -24,6 +24,7 @@ export interface IUser {
   email?: string;
   token?: string;
   friends_id?: IUser[];
+  avatar_url?: string;
 }
 
 export interface AuthState {

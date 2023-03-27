@@ -12,10 +12,24 @@ const services = {
     }
   },
 
-  async getBlogs(id: number): Promise<any> {
-    let api = `/blog/${id}`;
-    let response = await axiosInstance.get(api);
-    return response;
+  async getBlogs(username: string): Promise<any> {
+    try {
+      let api = `/blog/${username}`;
+      let response = await axiosInstance.get(api);
+      return response;
+    } catch (error: any) {
+      return openNotification("error", error.message);
+    }
+  },
+
+  async deleteBlogById(id: string): Promise<any> {
+    try {
+      let api = `/blog/${id}`;
+      let response = await axiosInstance.delete(api);
+      return response;
+    } catch (error: any) {
+      return openNotification("error", error.message);
+    }
   }
 };
 

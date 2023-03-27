@@ -1,3 +1,4 @@
+import { openNotification } from "../layout/notification";
 import axiosInstance from "./axios";
 
 const services = {
@@ -29,6 +30,16 @@ const services = {
     let api = `/user/refresh`;
     let response = await axiosInstance.get(api);
     return response;
+  },
+
+  async updateUser(id: number, data: any): Promise<any> {
+    try {
+      let api = `/user/${id}`;
+      let response = await axiosInstance.put(api, data);
+      return response;
+    } catch (error: any) {
+      openNotification("error", error.message);
+    }
   }
 };
 

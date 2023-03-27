@@ -1,5 +1,6 @@
 import {
   DesktopOutlined,
+  HomeOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   PhoneOutlined,
@@ -24,6 +25,7 @@ import {
 } from "../modules/auth/redux/action";
 import { RootState } from "../redux/store";
 import services from "../services";
+import ChangeAvatar from "./container/ChangeAvatar";
 
 const { Header, Content, Sider } = Layout;
 
@@ -66,6 +68,10 @@ const AppLayout = ({ children }: Props) => {
 
   const items: MenuProps["items"] = [
     {
+      key: "2",
+      label: <ChangeAvatar />
+    },
+    {
       key: "1",
       label: <div onClick={handleLogOut}>Log out</div>
     }
@@ -79,7 +85,7 @@ const AppLayout = ({ children }: Props) => {
       (user
         ? [
             getItem(
-              <Link to={`blogs/${user.id}`}>{user.username}</Link>,
+              <Link to={`blogs/${user.username}`}>{user.username}</Link>,
               `sub-blog-${user.id}`
             )
           ]
@@ -87,7 +93,7 @@ const AppLayout = ({ children }: Props) => {
       ).concat(
         (user.friends_id || []).map(i => {
           return getItem(
-            <Link to={`blogs/${i.id}`}>{i.username}</Link>,
+            <Link to={`blogs/${i.username}`}>{i.username}</Link>,
             `sub-blog-${i.id}`
           );
         })
@@ -112,6 +118,20 @@ const AppLayout = ({ children }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location]);
 
+  const getBreadCrumb = useCallback(() => {
+    let path = location.pathname;
+    const item = path.split("/");
+    if (item && item.length) {
+      return item.map(i => {
+        return {
+          title: i === "" ? <HomeOutlined /> : i
+        };
+      });
+    }
+
+    return [];
+  }, [location]);
+
   const getFriendsList = useCallback(async () => {
     const res = await services.Chat.getFriendList();
     if (res.data) {
@@ -126,6 +146,7 @@ const AppLayout = ({ children }: Props) => {
 
   return (
     <Layout style={{ height: "100vh", overflow: "hidden" }}>
+      {/* Side Menu */}
       <Sider trigger={null} collapsed={collapsed}>
         <div
           style={{
@@ -142,10 +163,12 @@ const AppLayout = ({ children }: Props) => {
         />
       </Sider>
       <Layout className="site-layout">
+        {/* Header */}
         <Header
           className="layout-header"
           style={{ padding: "0px 16px", background: colorBgContainer }}
         >
+          {/* Button collapse Menu */}
           {React.createElement(
             collapsed ? MenuUnfoldOutlined : MenuFoldOutlined,
             {
@@ -153,6 +176,7 @@ const AppLayout = ({ children }: Props) => {
               onClick: () => setCollapsed(!collapsed)
             }
           )}
+
           <div style={{ display: "flex", alignItems: "center" }}>
             <p>{user?.username}</p>
             <Dropdown
@@ -162,17 +186,17 @@ const AppLayout = ({ children }: Props) => {
               placement="bottomRight"
             >
               <Avatar
+              src={user.avatar_url}
                 style={{ cursor: "pointer", marginLeft: 8 }}
                 icon={<UserOutlined />}
               />
             </Dropdown>
           </div>
         </Header>
+
+        {/* Main content */}
         <Content style={{ margin: "0 16px" }}>
-          <Breadcrumb style={{ margin: "16px 0" }}>
-            <Breadcrumb.Item>User</Breadcrumb.Item>
-            <Breadcrumb.Item>Bill</Breadcrumb.Item>
-          </Breadcrumb>
+          <Breadcrumb style={{ margin: "16px 0" }} items={getBreadCrumb()} />
           <div
             style={{
               padding: 24,

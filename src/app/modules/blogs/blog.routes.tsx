@@ -5,7 +5,7 @@ const BlogPage = lazy(() => import("./pages/index"))
 const BlogsRoutes = memo(() => {
   return (
     <Routes>
-      <Route path="/:userId" element={<BlogPage />} />
+      <Route path="/:username" element={<BlogPage />} />
     </Routes>
   );
 });
