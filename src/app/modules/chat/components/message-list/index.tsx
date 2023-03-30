@@ -361,7 +361,7 @@ const MessageList: React.FC = () => {
               className={message.sender !== user.id ? "reader" : "sender"}
             >
               <Tooltip
-                title={moment(message.created_on).format("DD-MM-YYYY HH:mm")}
+                title={moment(message.created_at).format("DD-MM-YYYY HH:mm")}
                 trigger="hover"
               >
                 {renderMessage(message)}

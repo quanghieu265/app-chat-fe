@@ -5,7 +5,7 @@ import {
   loginSaga,
   registerSaga,
   registerSagaSuccess,
-  setAuthenticated,
+  setAuthenticated
 } from "./action";
 
 const handleSignUp = function* (action: { payload: any }) {
@@ -16,8 +16,7 @@ const handleSignUp = function* (action: { payload: any }) {
     yield delay(1000);
     yield put(registerSagaSuccess(true));
   } catch (error: any) {
-    const { response } = error;
-    openNotification("error", response.data.message);
+    openNotification("error", error?.message);
   }
 };
 
@@ -30,8 +29,7 @@ const handleLogin = function* (action: { payload: any }) {
       yield put(setAuthenticated(data));
     }
   } catch (error: any) {
-    const { response } = error;
-    openNotification("error", response.data.message);
+    openNotification("error", error?.message);
   }
 };
 

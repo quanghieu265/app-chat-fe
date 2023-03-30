@@ -20,7 +20,6 @@ import moment from "moment";
 import { useCallback, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import "./styles.scss";
-const { TextArea } = Input;
 
 const BlogPage = () => {
   let { username } = useParams();

@@ -8,8 +8,7 @@ const handleGetCurrentChat = function* () {
     let { data } = yield call(services.Chat.getCurrentChat);
     yield put(setCurrentChat(data));
   } catch (error: any) {
-    const { response } = error;    
-    openNotification("error", response.data.message);
+    openNotification("error", error?.message);
   }
 };
 

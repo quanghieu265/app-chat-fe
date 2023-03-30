@@ -13,7 +13,7 @@ export interface ChatItem {
 }
 
 export interface MessageItem {
-  created_on: MomentInput;
+  created_at: MomentInput;
   chat_room_id?: number;
   content?: string;
   id?: number;
