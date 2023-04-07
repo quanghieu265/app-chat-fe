@@ -23,7 +23,7 @@ interface IRoutes {
 export const privateRoutes: IRoutes[] = [
   {
     name: "Streaming",
-    path: "stream/*",
+    path: "streams/*",
     element: <StreamRoutes />,
     icon: <DesktopOutlined />
   },

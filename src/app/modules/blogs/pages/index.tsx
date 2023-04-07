@@ -201,7 +201,7 @@ const BlogPage = () => {
       >
         <div
           ref={readRef}
-          style={{ maxHeight: "75vh", overflow: "auto" }}
+          style={{ maxHeight: "75vh", overflow: "auto", width: "100%" }}
           className="contents"
         ></div>
       </Modal>

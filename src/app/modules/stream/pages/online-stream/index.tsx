@@ -9,7 +9,7 @@ let videoSegment = 0;
 let transmuxer = new muxjs.mp4.Transmuxer();
 let mediaSource: MediaSource;
 
-const StreamPage: React.FC = () => {
+const StreamOnlinePage: React.FC = () => {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -92,4 +92,4 @@ const StreamPage: React.FC = () => {
   );
 };
 
-export default StreamPage;
+export default StreamOnlinePage;

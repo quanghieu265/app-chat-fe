@@ -101,7 +101,10 @@ const AppLayout = ({ children }: Props) => {
     ),
     getItem(<Link to="chat">Chat</Link>, "chat", <PieChartOutlined />),
     getItem(<Link to="call">Video Call</Link>, "call", <PhoneOutlined />),
-    getItem(<Link to="stream">Streaming</Link>, "stream", <DesktopOutlined />)
+    getItem("Streaming", "stream", <DesktopOutlined />, [
+      getItem(<Link to="streams/online">Online Video</Link>, "online"),
+      getItem(<Link to={`streams/playlist/${user.username}`}>Playlist Video</Link>, "videos")
+    ])
   ];
 
   const getSelectMenu = useCallback(() => {
@@ -186,7 +189,7 @@ const AppLayout = ({ children }: Props) => {
               placement="bottomRight"
             >
               <Avatar
-              src={user.avatar_url}
+                src={user.avatar_url}
                 style={{ cursor: "pointer", marginLeft: 8 }}
                 icon={<UserOutlined />}
               />
