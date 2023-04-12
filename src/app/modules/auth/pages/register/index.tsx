@@ -12,13 +12,10 @@ const RegisterPage: React.FC = () => {
   const isRegister = useSelector((state: RootState) => state.auth.isRegister);
 
   const onFinish = async (values: any) => {
-    const res = await dispatch(registerSaga(values));
-    console.log(res);
+    await dispatch(registerSaga(values));
   };
 
-  const onFinishFailed = (errorInfo: any) => {
-    console.log("Failed:", errorInfo);
-  };
+  const onFinishFailed = (errorInfo: any) => {};
 
   useEffect(() => {
     if (isRegister) {

@@ -35,6 +35,16 @@ const services = {
     } catch (error: any) {
       return openNotification("error", error.message);
     }
+  },
+
+  async getVideoById(id: string): Promise<any> {
+    try {
+      let api = `/playlist/video/${id}`;
+      let response = await axiosInstance.get(api);
+      return response;
+    } catch (error: any) {
+      return openNotification("error", error.message);
+    }
   }
 };
 

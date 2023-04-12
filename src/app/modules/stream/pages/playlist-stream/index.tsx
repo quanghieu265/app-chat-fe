@@ -3,10 +3,11 @@ import services from "@/app/services";
 import { storageFB } from "@/firebase/index";
 import { InboxOutlined, PlusOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
-import { Avatar, Card, Col, Popconfirm, UploadProps } from "antd";
+import { Avatar, Card, Col, Popconfirm, Row, UploadProps } from "antd";
 import { Button, Form, Input, Modal, Upload, UploadFile, message } from "antd";
 import Meta from "antd/es/card/Meta";
 import {
+  UploadTask,
   getDownloadURL,
   ref,
   uploadBytesResumable,
@@ -14,9 +15,11 @@ import {
 } from "firebase/storage";
 import moment from "moment";
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
+let uploadTask: UploadTask;
 const { Dragger } = Upload;
+
 const StreamPlaylistPage = () => {
   let { username } = useParams();
   const [form] = Form.useForm();
@@ -118,7 +121,7 @@ const StreamPlaylistPage = () => {
     setLoading(true);
     const { file, onProgress } = options;
     const videoRef = ref(storageFB, `videos/${file.name}`);
-    const uploadTask = uploadBytesResumable(videoRef, file);
+    uploadTask = uploadBytesResumable(videoRef, file);
     uploadTask.on(
       "state_changed",
       snapshot => {
@@ -155,13 +158,14 @@ const StreamPlaylistPage = () => {
     setOpen(false);
     form.resetFields();
     setFileList([]);
+    if (uploadTask) {
+      uploadTask.cancel();
+    }
   };
-
-  console.log("data", data);
 
   return (
     <>
-      <div style={{ display: "flex", alignItems: "center" }}>
+      <div style={{ display: "flex", alignItems: "center", marginBottom: 16 }}>
         <h1>My Playlist</h1>
         <Button
           onClick={() => {
@@ -173,39 +177,30 @@ const StreamPlaylistPage = () => {
         ></Button>
       </div>
 
-      {(data?.playlist || []).map((i: any, index: number) => {
-        return (
-          <Col span={6} key={i._id}>
-            <Card
-              cover={
-                <img
-                  alt={`video-thumbnail-${index}`}
-                  src={i.thumbUrl}
-                />
-              }
-              // extra={
-              //   <Popconfirm
-              //     title="Delete video"
-              //     description="Are you sure to delete this video?"
-              //     onConfirm={() => {
-              //       // deleteBlogById.mutate(i._id);
-              //     }}
-              //     okText="Yes"
-              //     cancelText="No"
-              //   >
-              //     <Button type="text">Delete</Button>
-              //   </Popconfirm>
-              // }
-            >
-              <Meta
-                avatar={<Avatar src={data.avatar_url} />}
-                title={i.title}
-                description={`${data.username} - ${moment(i.createdAt).fromNow()} `}
-              />
-            </Card>
-          </Col>
-        );
-      })}
+      <Row gutter={[16, 16]}>
+        {(data?.playlist || []).map((i: any, index: number) => {
+          return (
+            <Col span={6} key={i._id}>
+              <Link to={`/streams/watch?id=${i._id}`}>
+                <Card
+                  cover={
+                    <img alt={`video-thumbnail-${index}`} src={i.thumbUrl} />
+                  }
+                >
+                  <Meta
+                    style={{ padding: 8 }}
+                    avatar={<Avatar src={data.avatar_url} />}
+                    title={i.title}
+                    description={`${data.username} - ${moment(
+                      i.createdAt
+                    ).fromNow()} `}
+                  />
+                </Card>
+              </Link>
+            </Col>
+          );
+        })}
+      </Row>
 
       <Modal
         centered={true}
