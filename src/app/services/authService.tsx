@@ -40,6 +40,16 @@ const services = {
     } catch (error: any) {
       openNotification("error", error.message);
     }
+  },
+
+  async getUsersInfo(): Promise<any> {
+    try {
+      let api = `/user`;
+      let response = await axiosInstance.get(api);
+      return response;
+    } catch (error: any) {
+      openNotification("error", error.message);
+    }
   }
 };
 

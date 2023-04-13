@@ -11,11 +11,11 @@ const requestHeader = {
 const axiosConfig = {
   baseURL:
     process.env.NODE_ENV === "development"
-      ? "http://localhost:5000/api"
+      ? process.env.REACT_APP_LOCAL_BACKEND_URL + "/api"
       : process.env.REACT_APP_BACKEND_URL + "/api",
   header: requestHeader,
   withCredentials: true,
-  credentials: "include"
+  credentials: "include",
 };
 
 const axiosInstance = axios.create(axiosConfig);
@@ -40,8 +40,8 @@ axiosInstance.interceptors.response.use(
   response => {
     return response;
   },
-  function (error) {
-    if (error.response.status === 401) {
+  function (error) {    
+    if (error?.response?.status === 401) {
       localStorage.clear();
       window.location.reload();
     }
